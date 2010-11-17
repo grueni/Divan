@@ -12,6 +12,9 @@ namespace Divan
     /// </summary>
     public class CouchDesignDocument : CouchDocument, IEquatable<CouchDesignDocument>
     {
+
+        public Dictionary<string, ICouchViewDefinition> Views = new Dictionary<string, ICouchViewDefinition>();
+
         public IList<CouchViewDefinition> Definitions = new List<CouchViewDefinition>();
         
         // This List is only used if you also have Couchdb-Lucene installed
@@ -52,6 +55,7 @@ namespace Divan
         public CouchViewDefinition AddView(string name, string map, string reduce)
         {
             var def = new CouchViewDefinition(name, map, reduce, this);
+            Views.Add(name, def);
             Definitions.Add(def);
             return def;
         }
@@ -69,6 +73,8 @@ namespace Divan
         public void RemoveView(CouchViewDefinition view)
         {
             view.Doc = null;
+            if (Views.ContainsKey(view.Name))
+                Views.Remove(view.Name);
             Definitions.Remove(view);
         }
 
@@ -193,6 +199,8 @@ namespace Divan
             {
                 var v = new CouchViewDefinition(property.Name, this);
                 v.ReadJson((JObject)views[property.Name]);
+                if (Views.ContainsKey(property.Name)) Views.Remove(property.Name);
+                Views.Add(property.Name, v);
                 Definitions.Add(v);
             }
 
