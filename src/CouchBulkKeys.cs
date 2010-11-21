@@ -25,6 +25,11 @@ namespace Divan
             Keys = keys;
         }
 
+        public CouchBulkKeys(JToken[] keys) 
+        {
+             Keys = keys;
+        }
+
         public object[] Keys { get; set; }
 
         #region ICouchBulk Members
@@ -35,7 +40,15 @@ namespace Divan
             writer.WriteStartArray();
             foreach (var id in Keys)
             {
-                writer.WriteValue(id);
+                // tretiy3
+                if (id is JToken)
+                {
+                    writer.WriteRawValue(id.ToString());
+                }
+                else
+                {
+                    writer.WriteValue(id);
+                }
             }
             writer.WriteEndArray();
         }
