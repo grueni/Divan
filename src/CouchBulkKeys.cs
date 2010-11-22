@@ -40,15 +40,15 @@ namespace Divan
             writer.WriteStartArray();
             foreach (var id in Keys)
             {
-                // tretiy3
-                if (id is JToken)
-                {
-                    writer.WriteRawValue(id.ToString());
-                }
-                else
-                {
-                    writer.WriteValue(id);
-                }
+                //tretiy3
+				if (id is JToken)
+				{
+					writer.WriteRawValue(id.ToString());
+				}
+				else
+				{
+					writer.WriteValue(id);
+				}
             }
             writer.WriteEndArray();
         }
