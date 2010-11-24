@@ -14,9 +14,11 @@ namespace Divan
     {
 
         public Dictionary<string, ICouchViewDefinition> Views = new Dictionary<string, ICouchViewDefinition>();
+		public Dictionary<string, ICouchViewDefinition> Lists = new Dictionary<string, ICouchViewDefinition>();
 
-        public IList<CouchViewDefinition> Definitions = new List<CouchViewDefinition>();
-        
+        public IList<CouchViewDefinition> ViewDefinitions = new List<CouchViewDefinition>();
+		public IList<CouchListDefinition> ListDefinitions = new List<CouchListDefinition>();
+
         // This List is only used if you also have Couchdb-Lucene installed
         public IList<CouchLuceneViewDefinition> LuceneDefinitions = new List<CouchLuceneViewDefinition>();
 
@@ -45,6 +47,7 @@ namespace Divan
             return AddView(name, map, null);
         }
 
+
         /// <summary>
         /// Add view with a reduce function.
         /// </summary>
@@ -56,9 +59,17 @@ namespace Divan
         {
             var def = new CouchViewDefinition(name, map, reduce, this);
             Views.Add(name, def);
-            Definitions.Add(def);
+            ViewDefinitions.Add(def);
             return def;
         }
+
+		public CouchListDefinition AddList(string name, string list)
+		{
+			var def = new CouchListDefinition(name, list, this);
+			Lists.Add(name, def);
+			ListDefinitions.Add(def);
+			return def;
+		}
 
         public void RemoveViewNamed(string viewName)
         {
@@ -67,7 +78,7 @@ namespace Divan
 
         private CouchViewDefinition FindView(string name)
         {
-            return Definitions.Where(x => x.Name == name).First();
+            return ViewDefinitions.Where(x => x.Name == name).First();
         }
 
         public void RemoveView(CouchViewDefinition view)
@@ -75,7 +86,7 @@ namespace Divan
             view.Doc = null;
             if (Views.ContainsKey(view.Name))
                 Views.Remove(view.Name);
-            Definitions.Remove(view);
+            ViewDefinitions.Remove(view);
         }
 
         /// <summary>
@@ -168,11 +179,21 @@ namespace Divan
             writer.WriteValue(Language);
             writer.WritePropertyName("views");
             writer.WriteStartObject();
-            foreach (var definition in Definitions)
+            foreach (var definition in ViewDefinitions)
             {
                 definition.WriteJson(writer);
             }
             writer.WriteEndObject();
+
+			writer.WritePropertyName("lists");
+			writer.WriteStartObject();
+			foreach (var definition in ListDefinitions)
+			{
+				definition.WriteJson(writer);
+			}
+			writer.WriteEndObject();
+
+
             
             // If we have Lucene definitions we write them too
             if (LuceneDefinitions.Count > 0)
@@ -192,7 +213,7 @@ namespace Divan
             ReadIdAndRev(this, obj);
             if (obj["language"] != null)
                 Language = obj["language"].Value<string>();
-            Definitions = new List<CouchViewDefinition>();
+            ViewDefinitions = new List<CouchViewDefinition>();
             var views = (JObject)obj["views"];
 
             foreach (var property in views.Properties())
@@ -201,8 +222,24 @@ namespace Divan
                 v.ReadJson((JObject)views[property.Name]);
                 if (Views.ContainsKey(property.Name)) Views.Remove(property.Name);
                 Views.Add(property.Name, v);
-                Definitions.Add(v);
+                ViewDefinitions.Add(v);
             }
+
+
+			var lists = (JObject)obj["lists"];
+			if (lists != null)
+			{
+				foreach (var property in views.Properties())
+				{
+					var l = new CouchListDefinition(property.Name, this);
+					l.ReadJson((JObject)lists[property.Name]);
+					if (Lists.ContainsKey(property.Name)) Lists.Remove(property.Name);
+					Lists.Add(property.Name, l);
+					ListDefinitions.Add(l);
+				}
+			}
+
+
 
             var fulltext = (JObject)obj["fulltext"];
             // If we have Lucene definitions we read them too
@@ -219,7 +256,7 @@ namespace Divan
 
         public bool Equals(CouchDesignDocument other)
         {
-            return Id.Equals(other.Id) && Language.Equals(other.Language) && Definitions.SequenceEqual(other.Definitions);
+            return Id.Equals(other.Id) && Language.Equals(other.Language) && ViewDefinitions.SequenceEqual(other.ViewDefinitions);
         }
     }
 }
