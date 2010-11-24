@@ -31,7 +31,7 @@ namespace Divan
 			List = (string)obj;
 		}
 
-		new public virtual string Path()
+		public override string Path()
 		{
 			if (Doc.Id == "_design/")
 			{
