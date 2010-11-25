@@ -15,10 +15,10 @@ namespace Divan
 		public CouchListDefinition(string name, CouchDesignDocument doc) : base(name, doc) {}
 
 
-        public CouchListDefinition(string name, string list, CouchDesignDocument doc): base(name, doc)
-        {
-            List = list;
-        }
+		public CouchListDefinition(string name, string list, CouchDesignDocument doc): base(name, doc)
+		{
+			List = list;
+		}
 
 		new public void WriteJson(JsonWriter writer)
 		{
@@ -38,6 +38,11 @@ namespace Divan
 				return Name;
 			}
 			return Doc.Id + "/_list/" + Name + "/" + ViewName;
+		}
+
+		public CouchListQuery Query()
+		{
+			return Doc.Owner.Query(this);
 		}
 	}
 }

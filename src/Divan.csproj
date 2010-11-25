@@ -78,6 +78,7 @@
     <Compile Include="CouchGenericViewResult.cs" />
     <Compile Include="CouchJsonDocument.cs" />
     <Compile Include="CouchListDefinition.cs" />
+    <Compile Include="CouchListQuery.cs" />
     <Compile Include="CouchNotFoundException.cs" />
     <Compile Include="CouchPermanentViewResult.cs" />
     <Compile Include="CouchQuery.cs" />

@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Net;
+using System.IO;
+
+namespace Divan
+{
+	public class CouchListQuery : CouchQuery
+	{
+
+		public CouchListQuery(CouchListDefinition list) : base(list)
+		{
+		}
+
+		public  string GetResult()
+		{
+			try
+			{
+				var sb = new StringBuilder();
+				var reader = new StreamReader(Request().Response().GetResponseStream());
+				sb.Append(reader.ReadLine());
+				return sb.ToString();
+			}
+			catch (WebException e)
+			{
+				throw CouchException.Create("Query failed", e);
+			}
+		}
+
+	}
+}
