@@ -85,6 +85,8 @@
     <Compile Include="CouchQueryDocument.cs" />
     <Compile Include="CouchRequest.cs" />
     <Compile Include="CouchServer.cs" />
+    <Compile Include="CouchShowDefinition.cs" />
+    <Compile Include="CouchShowQuery.cs" />
     <Compile Include="CouchViewDefinitionBase.cs" />
     <Compile Include="CouchViewResult.cs" />
     <Compile Include="CouchViewDefinition.cs" />

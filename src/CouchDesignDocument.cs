@@ -15,9 +15,11 @@ namespace Divan
 
 		public Dictionary<string, ICouchViewDefinition> Views = new Dictionary<string, ICouchViewDefinition>();
 		public Dictionary<string, CouchListDefinition> Lists = new Dictionary<string, CouchListDefinition>();
+		public Dictionary<string, CouchShowDefinition> Shows = new Dictionary<string, CouchShowDefinition>();
 
 		public IList<CouchViewDefinition> ViewDefinitions = new List<CouchViewDefinition>();
 		public IList<CouchListDefinition> ListDefinitions = new List<CouchListDefinition>();
+		public IList<CouchShowDefinition> ShowDefinitions = new List<CouchShowDefinition>();
 
 		// This List is only used if you also have Couchdb-Lucene installed
 		public IList<CouchLuceneViewDefinition> LuceneDefinitions = new List<CouchLuceneViewDefinition>();
@@ -68,6 +70,14 @@ namespace Divan
 			var def = new CouchListDefinition(name, list, this);
 			Lists.Add(name, def);
 			ListDefinitions.Add(def);
+			return def;
+		}
+
+		public CouchShowDefinition AddShow(string name, string show)
+		{
+			var def = new CouchShowDefinition(name, show, this);
+			Shows.Add(name, def);
+			ShowDefinitions.Add(def);
 			return def;
 		}
 
@@ -193,6 +203,14 @@ namespace Divan
 			}
 			writer.WriteEndObject();
 
+			writer.WritePropertyName("shows");
+			writer.WriteStartObject();
+			foreach (var definition in ShowDefinitions)
+			{
+				definition.WriteJson(writer);
+			}
+			writer.WriteEndObject();
+
 
 			
 			// If we have Lucene definitions we write them too
@@ -236,6 +254,20 @@ namespace Divan
 					if (Lists.ContainsKey(property.Name)) Lists.Remove(property.Name);
 					Lists.Add(property.Name, l);
 					ListDefinitions.Add(l);
+				}
+			}
+
+
+			var shows = (JObject)obj["shows"];
+			if (shows != null)
+			{
+				foreach (var property in shows.Properties())
+				{
+					var l = new CouchShowDefinition(property.Name, this);
+					l.ReadJson((JObject)lists[property.Name]);
+					if (Lists.ContainsKey(property.Name)) Lists.Remove(property.Name);
+					Shows.Add(property.Name, l);
+					ShowDefinitions.Add(l);
 				}
 			}
 

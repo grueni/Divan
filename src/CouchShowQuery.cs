@@ -7,14 +7,13 @@ using System.IO;
 
 namespace Divan
 {
-	public class CouchListQuery : CouchQuery
+	public class CouchShowQuery: CouchQuery
 	{
-
-		public CouchListQuery(CouchListDefinition list) : base(list)
+		public CouchShowQuery(CouchShowDefinition show) : base(show)
 		{
 		}
 
-		new public string GetResult()
+		new public  string GetResult()
 		{
 			try
 			{

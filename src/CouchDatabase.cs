@@ -680,6 +680,12 @@ namespace Divan
 			return new CouchListQuery(list);
 		}
 
+
+		public CouchShowQuery Query(CouchShowDefinition show)
+		{
+			return new CouchShowQuery(show);
+		}
+
 		public CouchQuery QueryAllDocuments()
 		{
 			return Query(null, "_all_docs");

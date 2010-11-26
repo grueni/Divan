@@ -48,6 +48,7 @@ namespace Divan
 		ICouchViewDefinition NewTempView(string designDoc, string viewName, string mapText);
 		CouchQuery Query(ICouchViewDefinition view);
 		CouchListQuery Query(CouchListDefinition list);
+		CouchShowQuery Query(CouchShowDefinition show);
 		CouchQuery Query(string designName, string viewName);
 		CouchLuceneQuery Query(CouchLuceneViewDefinition view);
 		CouchQuery QueryAllDocuments();
