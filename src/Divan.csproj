@@ -77,12 +77,16 @@
     <Compile Include="CouchException.cs" />
     <Compile Include="CouchGenericViewResult.cs" />
     <Compile Include="CouchJsonDocument.cs" />
+    <Compile Include="CouchListDefinition.cs" />
+    <Compile Include="CouchListQuery.cs" />
     <Compile Include="CouchNotFoundException.cs" />
     <Compile Include="CouchPermanentViewResult.cs" />
     <Compile Include="CouchQuery.cs" />
     <Compile Include="CouchQueryDocument.cs" />
     <Compile Include="CouchRequest.cs" />
     <Compile Include="CouchServer.cs" />
+    <Compile Include="CouchShowDefinition.cs" />
+    <Compile Include="CouchShowQuery.cs" />
     <Compile Include="CouchViewDefinitionBase.cs" />
     <Compile Include="CouchViewResult.cs" />
     <Compile Include="CouchViewDefinition.cs" />
