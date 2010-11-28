@@ -14,14 +14,15 @@ namespace Divan
 		{
 		}
 
-		new public string GetResult()
+        new public StreamReader GetResult()
 		{
 			try
 			{
-				var sb = new StringBuilder();
-				var reader = new StreamReader(Request().Response().GetResponseStream());
-				sb.Append(reader.ReadLine());
-				return sb.ToString();
+                //var sb = new StringBuilder();
+				//var reader = new StreamReader(Request().Response().GetResponseStream());
+                //sb.Append(reader.ReadLine());
+                //return sb.ToString();
+                return new StreamReader(Request().Response().GetResponseStream());
 			}
 			catch (WebException e)
 			{

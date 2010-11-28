@@ -40,7 +40,7 @@ namespace Divan
 			return Doc.Id + "/_list/" + Name + "/" + ViewName;
 		}
 
-		public CouchListQuery Query()
+		new public CouchListQuery Query()
 		{
 			return Doc.Owner.Query(this);
 		}
