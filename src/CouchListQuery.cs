@@ -14,7 +14,7 @@ namespace Divan
 		{
 		}
 
-        new public StreamReader GetResult()
+        new public Stream GetResult()
 		{
 			try
 			{
@@ -22,7 +22,7 @@ namespace Divan
 				//var reader = new StreamReader(Request().Response().GetResponseStream());
                 //sb.Append(reader.ReadLine());
                 //return sb.ToString();
-                return new StreamReader(Request().Response().GetResponseStream());
+                return Request().Response().GetResponseStream();
 			}
 			catch (WebException e)
 			{
