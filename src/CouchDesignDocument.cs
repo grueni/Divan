@@ -263,11 +263,13 @@ namespace Divan
 			{
 				foreach (var property in shows.Properties())
 				{
-					var l = new CouchShowDefinition(property.Name, this);
-					l.ReadJson((JObject)lists[property.Name]);
-					if (Lists.ContainsKey(property.Name)) Lists.Remove(property.Name);
-					Shows.Add(property.Name, l);
-					ShowDefinitions.Add(l);
+					var s = new CouchShowDefinition(property.Name, this);
+					var show = shows[property.Name] as JObject;
+					if (show == null) continue;
+					s.ReadJson(show);
+					if (Shows.ContainsKey(property.Name)) Shows.Remove(property.Name);
+					Shows.Add(property.Name, s);
+					ShowDefinitions.Add(s);
 				}
 			}
 
