@@ -18,6 +18,11 @@ Divan is under the MIT-license, see file LICENSE.txt.
 * Has basic CouchDB-Lucene integration for making free text indexes and query them.
 * Offers several "hooks" for your own subclasses in order to add specializations.
 
+== Features on this branch (mgornik)
+* Ported to Visual Studio 2010 + .NET Framework 4.
+* Support for Cloudant service (using Cloudant search API as version of Lucene queries).
+* More Lucene support (e.g. generic view results for Lucene queries)
+
 == Does it work under Mono?
 You bet. Foretagsplatsen uses mainly windows (VS2008/.Net 3.5) but Divan is also developed using Monodevelop 2.0/Mono 2.4.2.3. We are currently using the Makefile integration in Monodevelop so Divan should also easily build from command line.
 
