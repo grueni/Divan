@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using System.Net;
+using System.Linq;
+using System.Text;
 using Newtonsoft.Json.Linq;
 
 namespace Divan.Lucene
@@ -13,25 +14,20 @@ namespace Divan.Lucene
     /// 
     /// The _body field is searched by default which will include the extracted text from all attachments.
     /// </summary>
-    public class CouchLuceneQuery
+    public class CouchLuceneQuery : LuceneQueryBase
     {
-        public readonly CouchLuceneViewDefinition View;
+        /// <summary>
+        /// Indicates if ETag should be used
+        /// </summary>
+        protected bool CheckETag;
 
-        // Special options
-        public bool checkETagUsingHead;
-        public Dictionary<string, string> Options = new Dictionary<string, string>();
-
-        public string postData;
-        public CouchLuceneViewResult Result;
-
-        public CouchLuceneQuery(CouchLuceneViewDefinition view)
+        /// <summary>
+        /// Create by specifying view to use with this query
+        /// </summary>
+        /// <param name="view">View to use</param>
+        public CouchLuceneQuery(CouchViewDefinitionBase view)
         {
             View = view;
-        }
-
-        public void ClearOptions()
-        {
-            Options = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -42,7 +38,6 @@ namespace Divan.Lucene
             Options["analyzer"] = value;
             return this;
         }
-
 
         /// <summary>
         /// Specify a JSONP callback wrapper. The full JSON result will be prepended
@@ -58,13 +53,12 @@ namespace Divan.Lucene
         /// Setting this to true disables response caching (the query is executed every time)
         /// and indents the JSON response for readability.
         /// </summary>
-        public CouchLuceneQuery Debug()
+        public LuceneQueryBase Debug()
         {
             Options["debug"] = "true";
             return this;
         }
-
-
+        
         /// <summary>
         /// Usually couchdb-lucene determines the Content-Type of its response based on the
         /// presence of the Accept header. If Accept contains "application/json", you get
@@ -79,27 +73,6 @@ namespace Divan.Lucene
             return this;
         }
 
-        public CouchLuceneQuery IncludeDocuments()
-        {
-            Options["include_docs"] = "true";
-            return this;
-        }
-
-        public CouchLuceneQuery Limit(int value)
-        {
-            Options["limit"] = value.ToString();
-            return this;
-        }
-
-        /// <summary>
-        /// The query to run (e.g, subject:hello). If not specified, the default field is searched.
-        /// </summary>
-        public CouchLuceneQuery Q(string value)
-        {
-            Options["q"] = value;
-            return this;
-        }
-
         /// <summary>
         /// (EXPERT) if true, returns a json response with a rewritten query and term frequencies.
         /// This allows correct distributed scoring when combining the results from multiple nodes.
@@ -110,22 +83,25 @@ namespace Divan.Lucene
             return this;
         }
 
-        public CouchLuceneQuery Skip(int value)
+        public override LuceneQueryBase Sort(IEnumerable<CouchSortCriteria> criteria)
         {
-            Options["skip"] = value.ToString();
-            return this;
-        }
+            // If no sort criteria has been given, leave the method:
+            if (null == criteria || 0 == criteria.Count())
+                return this;
 
-        /// <summary>
-        /// The fields to sort on. Prefix with / for ascending order
-        /// and \ for descending order (ascending is the default if not specified).
-        /// </summary>
-        public CouchLuceneQuery Sort(params object[] value)
-        {
-            if (value != null)
+            var itemCount = 0;
+            var text = new StringBuilder();
+            foreach (var item in criteria)
             {
-                Options["sort"] = JToken.FromObject(value).ToString();
+                if (itemCount > 0)
+                    text.Append(',');
+
+                text.Append(item.Order == CouchSortCriteria.OrderType.Ascending ? "/" : "\\");
+                text.Append(item.Field);
+                ++itemCount;
             }
+
+            Options["sort"] = text.ToString();
             return this;
         }
 
@@ -148,51 +124,11 @@ namespace Divan.Lucene
         /// </summary>
         public CouchLuceneQuery CheckETagUsingHead()
         {
-            checkETagUsingHead = true;
+            CheckETag = true;
             return this;
         }
 
-        public CouchLuceneViewResult GetResult()
-        {
-            try
-            {
-                return GetResult<CouchLuceneViewResult>();
-            }
-            catch (WebException e)
-            {
-                throw CouchException.Create("Query failed", e);
-            } 
-        }
-
-        public bool IsCachedAndValid()
-        {
-            // If we do not have a result it is not cached
-            if (Result == null)
-            {
-                return false;
-            }
-            ICouchRequest req = View.Request().QueryOptions(Options);
-            req.Etag(Result.etag);
-            return req.Head().Send().IsETagValid();
-        }
-
-        public string String()
-        {
-            return Request().String();
-        }
-
-
-        public ICouchRequest Request()
-        {
-            var req = View.Request().QueryOptions(Options);
-            if (postData != null)
-            {
-                req.Data(postData).Post();
-            }
-            return req;
-        }
-
-        public T GetResult<T>() where T : CouchLuceneViewResult, new()
+        public override T GetResult<T>()
         {
             if (Options["q"] == null)
             {
@@ -208,12 +144,12 @@ namespace Divan.Lucene
             {
                 // Tell the request what we already have
                 req.Etag(Result.etag);
-                if (checkETagUsingHead)
+                if (CheckETag)
                 {
                     // Make a HEAD request to avoid transfer of data
                     if (req.Head().Send().IsETagValid())
                     {
-                        return (T) Result;
+                        return (T)Result;
                     }
                     // Set back to GET before proceeding below
                     req.Get();
@@ -226,7 +162,23 @@ namespace Divan.Lucene
                 Result.Result(json, View);
                 Result.etag = req.Etag();
             }
-            return (T) Result;
+            return (T)Result;
+        }
+
+        /// <summary>
+        /// Checks if cached Result is still valid
+        /// </summary>
+        /// <returns>Indication if cached Result is valid</returns>
+        public bool IsCachedAndValid()
+        {
+            // If we do not have a result it is not cached
+            if (Result == null)
+            {
+                return false;
+            }
+            ICouchRequest req = View.Request().QueryOptions(Options);
+            req.Etag(Result.etag);
+            return req.Head().Send().IsETagValid();
         }
     }
 }

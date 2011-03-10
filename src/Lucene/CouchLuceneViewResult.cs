@@ -9,13 +9,13 @@ namespace Divan.Lucene
     /// from CouchDB and parsed into a JObject by Newtonsoft.Json. Basically
     /// the result is a JSON array of document key/score pairs.
     /// </summary>
-    public class CouchLuceneViewResult
+    public class CouchLuceneViewResult : ICouchViewResultRows
     {
-		private CouchLuceneViewDefinition view;
+        private CouchViewDefinitionBase view;
         public string etag;
         public JObject result;
 
-        public void Result(JObject obj, CouchLuceneViewDefinition aView)
+        public void Result(JObject obj, CouchViewDefinitionBase aView)
         {
             result = obj;
 			view = aView;

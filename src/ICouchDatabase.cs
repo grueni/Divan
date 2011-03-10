@@ -48,6 +48,7 @@ namespace Divan
         ICouchViewDefinition NewTempView(string designDoc, string viewName, string mapText);
         CouchQuery Query(ICouchViewDefinition view);
         CouchQuery Query(string designName, string viewName);
+        CloudantLuceneQuery Query(CloudantLuceneViewDefinition view);
         CouchLuceneQuery Query(CouchLuceneViewDefinition view);
         CouchQuery QueryAllDocuments();
         WebResponse ReadAttachment(string documentId, string attachmentName);

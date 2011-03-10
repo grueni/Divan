@@ -95,9 +95,9 @@ namespace Divan
                 {
                     sb.Append("&");
                 }
-                sb.Append(HttpUtility.UrlEncode(q.Key));
+                sb.Append(HttpUtility.UrlPathEncode(q.Key));
                 sb.Append("=");
-                sb.Append(HttpUtility.UrlEncode(q.Value));
+                sb.Append(HttpUtility.UrlPathEncode(q.Value));
             }
 
             return Query(sb.ToString());

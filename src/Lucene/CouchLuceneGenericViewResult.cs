@@ -1,20 +1,15 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Divan
+namespace Divan.Lucene
 {
-    /// <summary>
-    /// This is a view result from a CouchQuery that can return CouchDocuments for resulting documents (include_docs) and/or ICanJson documents for 
-    /// the result values. A value returned from a CouchDB view does not need to be a CouchDocument.
-    /// </summary>
-    /// <remarks>
-    /// This class uses basic implementation of IGenericViewResult from CouchGenericViewResultBase class.
-    /// </remarks>
-    public class CouchGenericViewResult : CouchViewResult, IGenericViewResult
+    public class CouchLuceneGenericViewResult : CouchLuceneViewResult, IGenericViewResult
     {
         private readonly CouchGenericViewResultBase _worker;
 
-        public CouchGenericViewResult()
+        public CouchLuceneGenericViewResult()
         {
             _worker = new CouchGenericViewResultBase(this);
         }

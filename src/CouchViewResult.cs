@@ -8,7 +8,7 @@ namespace Divan
     /// also includes some meta information and this class has methods to access these.
     /// Typically you use a subclass.
     /// </summary>
-    public class CouchViewResult
+    public class CouchViewResult : ICouchViewResultRows
     {
         public string etag;
         public JObject result;

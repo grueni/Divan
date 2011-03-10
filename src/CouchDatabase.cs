@@ -669,6 +669,10 @@ namespace Divan
             return new CouchQuery(view);
         }
 
+        public CloudantLuceneQuery Query(CloudantLuceneViewDefinition view)
+        {
+            return new CloudantLuceneQuery(view);
+        }
 
         public CouchLuceneQuery Query(CouchLuceneViewDefinition view)
         {
