@@ -8,7 +8,9 @@ namespace Divan.Lucene
     /// A definition of a CouchDB Lucene view with a name, an index function and some options, see below.
     /// </summary>
     public class CouchLuceneViewDefinition : CouchViewDefinitionBase, IEquatable<CouchLuceneViewDefinition>
-    {     
+    {
+        public static string FulltextIndexPrefix = "_fti/";
+
         /// <summary>
         /// Basic constructor used in ReadJson() etc.
         /// </summary>
@@ -148,10 +150,9 @@ namespace Divan.Lucene
 
         public override string Path()
         {
-			// Todo: "_fti" is hardcoded here.
-			// Also, for some odd reason Couchdb-Lucene does not want the "_design/"-prefix in query URLs.
+			// For some odd reason Couchdb-Lucene does not want the "_design/"-prefix in query URLs.
 		
-            return "_fti/" + WithoutDesignPart(Doc.Id) + "/" + Name;
+            return FulltextIndexPrefix + WithoutDesignPart(Doc.Id) + "/" + Name;
         }
 
 		static private string WithoutDesignPart(string name) {

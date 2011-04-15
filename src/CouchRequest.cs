@@ -87,18 +87,18 @@ namespace Divan
 				return this;
 			}
 
-			var sb = new StringBuilder();
-			sb.Append("?");
-			foreach (var q in options)
-			{
-				if (sb.Length > 1)
-				{
-					sb.Append("&");
-				}
-				sb.Append(HttpUtility.UrlEncode(q.Key));
-				sb.Append("=");
-				sb.Append(HttpUtility.UrlEncode(q.Value));
-			}
+            var sb = new StringBuilder();
+            sb.Append("?");
+            foreach (var q in options)
+            {
+                if (sb.Length > 1)
+                {
+                    sb.Append("&");
+                }
+                sb.Append(HttpUtility.UrlPathEncode(q.Key));
+                sb.Append("=");
+                sb.Append(HttpUtility.UrlPathEncode(q.Value));
+            }
 
 			return Query(sb.ToString());
 		}

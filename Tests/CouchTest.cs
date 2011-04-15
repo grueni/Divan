@@ -368,7 +368,7 @@ namespace Divan.Test
                     }");
             db2.SynchDesignDocuments(); // This should detect difference and overwrite the one in the db
 
-            Assert.That(db.GetDocument<CouchDesignDocument>("_design/computers").Definitions[0].Map,
+            Assert.That(db.GetDocument<CouchDesignDocument>("_design/computers").ViewDefinitions[0].Map,
                         Is.EqualTo(
                             @"function(doc) {
                         emit(doc.CPU, nil);
