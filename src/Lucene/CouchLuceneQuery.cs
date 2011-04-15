@@ -187,7 +187,7 @@ namespace Divan.Lucene
             var req = View.Request().QueryOptions(Options);
             if (postData != null)
             {
-                req.Data(postData).Post();
+                req.Data(postData).PostJson();
             }
             return req;
         }
