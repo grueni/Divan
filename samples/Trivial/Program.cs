@@ -20,7 +20,7 @@ namespace Trivial
 	{
 		static void Main(string[] args)
 		{
-			string host = "localhost";
+			string host = "10.50.241.71";
 			int port = 5984;
 
 			// Lets you see all HTTP requests made by Divan

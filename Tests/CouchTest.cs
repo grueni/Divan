@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
+using Newtonsoft.Json;
 
 namespace Divan.Test
 {
@@ -438,11 +439,93 @@ namespace Divan.Test
             }
         }
 
+        /// <summary>
+        /// Test that arbitrary documents can be saved and read without the need of WriteJson and ReadJson methods.
+        /// Needs a change in CouchDocumentWrapper.
+        /// Id as guid will be overwritten with an readable Id just for sake of easy reading in Fuson.
+        /// </summary>
+        [Test]
+        public void ShouldSaveAndCompareECarArbitraryDocuments()
+        {
+            var shortDistanceEcar = new ECar("shortDistance", "town", false);
+            var longDistanceEcar = new ECar("longDistance","weekendtrips",true);
+            shortDistanceEcar = db.SaveArbitraryDocument<ECar>(shortDistanceEcar);
+            longDistanceEcar = db.SaveArbitraryDocument<ECar>(longDistanceEcar);
+            Assert.That(shortDistanceEcar.Rev, Is.Not.Null);
+            Assert.That(longDistanceEcar.Rev, Is.Not.Null);
+            var test1 = db.GetArbitraryDocument<ECar>(shortDistanceEcar.Id, () => new ECar());
+            Assert.That(shortDistanceEcar.Distance == test1.Distance && shortDistanceEcar.name.Equals(test1.name));
+            var test2 = db.GetArbitraryDocument<ECar>(longDistanceEcar.Id, () => new ECar());
+            Assert.That(longDistanceEcar.Distance == test2.Distance && longDistanceEcar.name.Equals(test2.name));
+        }
+
         private class Car : CouchDocument
         {
             public string Make;
             public string Model;
             public int HorsePowers;
+        }
+
+        /// <summary>
+        /// This class allows the use of the serialization capabilities of Jsonsoft.
+        /// There is no need to override WriteJson or ReadJson and to define each properties to serialize.
+        /// You may choose the optin or the optout approach. 
+        /// In case of MemberSerialization.OptOut you have to define the properties which should not be serialized with JsonIgnore.
+        /// Instances of the class must be handled as arbitrary documents with divan.
+        /// The use of own guids is optional.
+        /// </summary>
+        [JsonObject(MemberSerialization.OptOut)]
+        private class DCICouchDocument
+        {
+            public DCICouchDocument()
+            {
+                Id = getNewGUID().ToString();
+                _rev = String.Empty;
+            }
+
+            public DCICouchDocument(String type)
+                : this()
+            {
+                this.type = type;
+            }
+
+            [JsonIgnore]
+            public String Id { get; set; }
+
+            [JsonIgnore]
+            public String Rev { get { return _rev; } set { _rev = value; } }
+
+            public String _rev { get; set; }
+            public String type { get; set; }
+            public virtual String name { get; set; }
+
+            public Guid getGUID(String guid)
+            {
+                return Guid.Parse(guid);
+            }
+
+            public Guid getNewGUID()
+            {
+                return Guid.NewGuid();
+            }
+        }
+
+        private class ECar : DCICouchDocument
+        {
+            static readonly String _type = "ECar";
+            private Boolean _hasRangeExtender = false;
+            private int _distance = 100;
+            public Boolean HasRangeExtender { get { return _hasRangeExtender; } set { if (value) { Distance = 500; _hasRangeExtender = value; } } }
+            public int Distance { get { return _distance; } set { _distance = value; } }
+            public ECar()
+            {
+            }
+            public ECar(String Id, String name, Boolean HasRangeExtender) : base(_type)
+            {
+                this.Id = Id;
+                this.name = name;
+                this.HasRangeExtender = HasRangeExtender;
+            }
         }
     }
 }
