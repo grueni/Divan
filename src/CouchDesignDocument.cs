@@ -232,22 +232,24 @@ namespace Divan
 			if (obj["language"] != null)
 				Language = obj["language"].Value<string>();
 			ViewDefinitions = new List<CouchViewDefinition>();
+
 			var views = (JObject)obj["views"];
-
-			foreach (var property in views.Properties())
-			{
-				var v = new CouchViewDefinition(property.Name, this);
-				v.ReadJson((JObject)views[property.Name]);
-				if (Views.ContainsKey(property.Name)) Views.Remove(property.Name);
-				Views.Add(property.Name, v);
-				ViewDefinitions.Add(v);
-			}
-
+            if (views != null)
+            {
+                foreach (var property in views.Properties())
+                {
+                    var v = new CouchViewDefinition(property.Name, this);
+                    v.ReadJson((JObject)views[property.Name]);
+                    if (Views.ContainsKey(property.Name)) Views.Remove(property.Name);
+                    Views.Add(property.Name, v);
+                    ViewDefinitions.Add(v);
+                }
+            }
 
 			var lists = (JObject)obj["lists"];
 			if (lists != null)
 			{
-				foreach (var property in views.Properties())
+                foreach (var property in lists.Properties())
 				{
 					var l = new CouchListDefinition(property.Name, this);
 					l.ReadJson((JObject)lists[property.Name]);
