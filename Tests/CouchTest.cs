@@ -467,25 +467,25 @@ namespace Divan.Test
         {
             var shortDistanceEcar = new ECar("town", false);
             var longDistanceEcar = new ECar("weekendtrips", true);
-            Console.WriteLine("shortDistanceEcar Id={0} Rev={1}", shortDistanceEcar.Id, shortDistanceEcar.Rev);
-            Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
+            //Console.WriteLine("shortDistanceEcar Id={0} Rev={1}", shortDistanceEcar.Id, shortDistanceEcar.Rev);
+            //Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
             shortDistanceEcar = db.SaveArbitraryDocument<ECar>(shortDistanceEcar);
             longDistanceEcar = db.SaveArbitraryDocument<ECar>(longDistanceEcar);
             Console.WriteLine("shortDistanceEcar Id={0} Rev={1}", shortDistanceEcar.Id, shortDistanceEcar.Rev);
-            Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
+            //Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
             Assert.That(shortDistanceEcar.Rev, Is.Not.Null);
             Assert.That(longDistanceEcar.Rev, Is.Not.Null);
             var test1 = db.GetArbitraryDocument<ECar>(shortDistanceEcar.Id, () => new ECar());
             Assert.That(shortDistanceEcar.Distance == test1.Distance && shortDistanceEcar.name.Equals(test1.name));
             var test2 = db.GetArbitraryDocument<ECar>(longDistanceEcar.Id, () => new ECar());
             Assert.That(longDistanceEcar.Distance == test2.Distance && longDistanceEcar.name.Equals(test2.name));
-            Console.WriteLine("test1 Id={0} Rev={1}", test1.Id, test1.Rev);
-            Console.WriteLine("test2 Id={0} Rev={1}", test2.Id, test2.Rev);
+            //Console.WriteLine("test1 Id={0} Rev={1}", test1.Id, test1.Rev);
+            //Console.WriteLine("test2 Id={0} Rev={1}", test2.Id, test2.Rev);
             longDistanceEcar.Distance = longDistanceEcar.Distance * 2;
             var rev0 = longDistanceEcar.Rev;
 
             longDistanceEcar = db.SaveArbitraryDocument<ECar>(longDistanceEcar);
-            Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
+            //Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
             Assert.That(!rev0.Equals(longDistanceEcar.Rev), "Revisions must be different!");
             db.DeleteDocument(shortDistanceEcar.Id, shortDistanceEcar.Rev);
             db.DeleteDocument(longDistanceEcar.Id, longDistanceEcar.Rev);
