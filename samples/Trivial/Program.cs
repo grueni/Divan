@@ -20,8 +20,12 @@ namespace Trivial
 	{
 		static void Main(string[] args)
 		{
-			string host = "10.50.241.71";
-			int port = 5984;
+            String database = "trivial";
+            String protocol = "http";
+            String host = "127.0.0.1";
+            int port = 5984;
+            String user = String.Empty;
+            String password = String.Empty;
 
 			// Lets you see all HTTP requests made by Divan
 			Trace.Listeners.Add(new ConsoleTraceListener());
@@ -36,16 +40,25 @@ namespace Trivial
 					Console.WriteLine("Using " + args[0] + ":5984");
 					host = args[0];
 					break;
-				case 2:
-					Console.WriteLine("Using " + args[0] + ":" + args[1]);
-					host = args[0];
-					port = int.Parse(args[1]);
-					break;
-			}
+                case 2:
+                    Console.WriteLine("Using " + args[0] + ":" + args[1]);
+                    host = args[0];
+                    port = int.Parse(args[1]);
+                    break;
+                case 6:
+                    Console.WriteLine("Using " + args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3] + ":" + args[4] + ":" + args[5]);
+                    protocol = args[0];
+                    host = args[1];
+                    port = int.Parse(args[2]);
+                    database = args[3];
+                    user = args[4];
+                    password = args[5];
+                    break;
+            }
 
 			// Get a server instance. It only holds host, port and a string database prefix.
 			// For non trivial usage of Divan you typically create your own subclass of CouchServer.
-			var server = new CouchServer(host, port);
+			var server = new CouchServer(protocol,host, port,user,password);
 
 			/* This has issues with the windows build of couch db - something about file locking
 			// a little bit of cleanup
@@ -57,8 +70,8 @@ namespace Trivial
 			// if it does not exist, create a CouchDatabase instance and then send Initialize() to it
 			// before returning it. The base class CouchDatabase also has very little state, it knows
 			// only the server that it belongs to and its own name.
-			var db = server.GetDatabase("trivial");
-			Console.WriteLine("Created database 'trivial'");
+			var db = server.GetDatabase(database);
+			Console.WriteLine("Created database '{0}'",database);
 
 			// Create and save 10 Cars with automatically allocated Ids by CouchDB.
 			// Divan stores ICouchDocuments and there are several ways you can go:

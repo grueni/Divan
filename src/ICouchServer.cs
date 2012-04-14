@@ -20,6 +20,7 @@
         string ServerName { get; }
         string DatabasePrefix { get; set; }
         bool RunningOnMono { get; }
+        string Protocol { get; }
         string Host { get; }
         int Port { get; }
         string UserName { get; }

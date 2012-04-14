@@ -20,7 +20,7 @@ namespace Divan.Test
     /// Custom Command in the Makefile! if someone can tell me how to handle this better on
     /// Mono/Monodevelop I am all ears.
     /// 
-    /// Run from command line using something like:
+    /// Run from command line using something like:rbitr
     /// 	nunit-console2 --labels -run=Divan.Test.CouchTest Tests/bin/Debug/Tests.dll
     /// </summary>
     [TestFixture]
@@ -31,9 +31,12 @@ namespace Divan.Test
         [SetUp]
         public void SetUp()
         {
-            var host = ConfigurationManager.AppSettings["CouchHost"] ?? "localhost";
-            var port = Convert.ToInt32(ConfigurationManager.AppSettings["CouchPort"] ?? "5984");
-            server = new CouchServer(host, port);
+            var protocol = ConfigurationManager.AppSettings["CouchDB.Protocol"] ?? "http";
+            var host = ConfigurationManager.AppSettings["CouchDB.Host"] ?? "localhost";
+            var port = Convert.ToInt32(ConfigurationManager.AppSettings["CouchDB.Port"] ?? "5984");
+            var user = ConfigurationManager.AppSettings["CouchDB.User"] ?? "";
+            var pass = ConfigurationManager.AppSettings["CouchDB.Password"] ?? "";
+            server = new CouchServer(protocol,host, port, user, pass);
             DbName = GetNewDbName();
             db = server.GetNewDatabase(DbName);
         }
@@ -462,16 +465,30 @@ namespace Divan.Test
         [Test]
         public void ShouldSaveAndCompareECarArbitraryDocuments()
         {
-            var shortDistanceEcar = new ECar("shortDistance", "town", false);
-            var longDistanceEcar = new ECar("longDistance","weekendtrips",true);
+            var shortDistanceEcar = new ECar("town", false);
+            var longDistanceEcar = new ECar("weekendtrips", true);
+            Console.WriteLine("shortDistanceEcar Id={0} Rev={1}", shortDistanceEcar.Id, shortDistanceEcar.Rev);
+            Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
             shortDistanceEcar = db.SaveArbitraryDocument<ECar>(shortDistanceEcar);
             longDistanceEcar = db.SaveArbitraryDocument<ECar>(longDistanceEcar);
+            Console.WriteLine("shortDistanceEcar Id={0} Rev={1}", shortDistanceEcar.Id, shortDistanceEcar.Rev);
+            Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
             Assert.That(shortDistanceEcar.Rev, Is.Not.Null);
             Assert.That(longDistanceEcar.Rev, Is.Not.Null);
             var test1 = db.GetArbitraryDocument<ECar>(shortDistanceEcar.Id, () => new ECar());
             Assert.That(shortDistanceEcar.Distance == test1.Distance && shortDistanceEcar.name.Equals(test1.name));
             var test2 = db.GetArbitraryDocument<ECar>(longDistanceEcar.Id, () => new ECar());
             Assert.That(longDistanceEcar.Distance == test2.Distance && longDistanceEcar.name.Equals(test2.name));
+            Console.WriteLine("test1 Id={0} Rev={1}", test1.Id, test1.Rev);
+            Console.WriteLine("test2 Id={0} Rev={1}", test2.Id, test2.Rev);
+            longDistanceEcar.Distance = longDistanceEcar.Distance * 2;
+            var rev0 = longDistanceEcar.Rev;
+
+            longDistanceEcar = db.SaveArbitraryDocument<ECar>(longDistanceEcar);
+            Console.WriteLine("longDistanceEcar Id={0} Rev={1}", longDistanceEcar.Id, longDistanceEcar.Rev);
+            Assert.That(!rev0.Equals(longDistanceEcar.Rev), "Revisions must be different!");
+            db.DeleteDocument(shortDistanceEcar.Id, shortDistanceEcar.Rev);
+            db.DeleteDocument(longDistanceEcar.Id, longDistanceEcar.Rev);
         }
 
         private class Car : CouchDocument
@@ -490,12 +507,16 @@ namespace Divan.Test
         /// The use of own guids is optional.
         /// </summary>
         [JsonObject(MemberSerialization.OptOut)]
-        private class DCICouchDocument
+        private class DCICouchDocument 
         {
+            private readonly JsonSerializer serializer = new JsonSerializer();
+
+            private String _id;
+            private String _rev;
+
             public DCICouchDocument()
             {
-                Id = getNewGUID().ToString();
-                _rev = String.Empty;
+                _id = getNewGUID().ToString();
             }
 
             public DCICouchDocument(String type)
@@ -504,15 +525,9 @@ namespace Divan.Test
                 this.type = type;
             }
 
-            [JsonIgnore]
-            public String Id { get; set; }
-
-            [JsonIgnore]
-            public String Rev { get { return _rev; } set { _rev = value; } }
-
-            public String _rev { get; set; }
             public String type { get; set; }
-            public virtual String name { get; set; }
+
+            public String name { get; set; }
 
             public Guid getGUID(String guid)
             {
@@ -523,6 +538,15 @@ namespace Divan.Test
             {
                 return Guid.NewGuid();
             }
+
+            [DefaultSettingValue("")]
+            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, PropertyName = "_id")]
+            public String Id { get { return _id; } set { _id = value; } }
+
+            [DefaultSettingValue("")]
+            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, PropertyName = "_rev")]
+            public String Rev { get { return _rev; } set { _rev = value; } }
+
         }
 
         private class ECar : DCICouchDocument
@@ -535,7 +559,14 @@ namespace Divan.Test
             public ECar()
             {
             }
-            public ECar(String Id, String name, Boolean HasRangeExtender) : base(_type)
+            public ECar(String name, Boolean HasRangeExtender)
+                : base(_type)
+            {
+                this.name = name;
+                this.HasRangeExtender = HasRangeExtender;
+            }
+            public ECar(String Id, String name, Boolean HasRangeExtender)
+                : base(_type)
             {
                 this.Id = Id;
                 this.name = name;

@@ -216,7 +216,8 @@ namespace Divan
 
 		private HttpWebRequest GetRequest()
 		{
-			var requestUri = new UriBuilder("http", server.Host, server.Port, ((db != null) ? db.Name + "/" : "") + path, query).Uri;
+			var requestUri = new UriBuilder(server.Protocol, server.Host, server.Port, ((db != null) ? db.Name + "/" : "") + path, query).Uri;
+
 			var request = WebRequest.Create(requestUri) as HttpWebRequest;
 			if (request == null)
 			{
@@ -245,7 +246,7 @@ namespace Divan
 				WriteData(request);
 			}
 
-			Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Request: {0} Method: {1}", requestUri, method));
+//            Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Request: {0} Method: {1}", requestUri, method));
 			return request;
 		}
 

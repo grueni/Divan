@@ -135,16 +135,7 @@ namespace Divan
                 obj.Remove("_rev");
                 obj.Remove("_id");                
                 obj.WriteTo(writer);
-            }
-            else if (String.IsNullOrEmpty(Rev))
-            {
-                var tokenWriter = new JTokenWriter();
-                serializer.Serialize(tokenWriter, instance);
-                var obj = (JObject)tokenWriter.Token;
-                obj.Remove("_rev");
-                obj.WriteTo(writer);
-            } 
-            else
+            } else
                 serializer.Serialize(writer, instance);
         }
 

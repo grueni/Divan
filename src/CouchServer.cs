@@ -21,8 +21,9 @@ namespace Divan
         
         private const string DefaultHost = "localhost";
         private const int DefaultPort = 5984;
-        private readonly JsonSerializer serializer = new JsonSerializer(); 
-        
+        private readonly JsonSerializer serializer = new JsonSerializer();
+
+        private readonly string protocol = "http";
         private readonly string host;
         private readonly int port;
 
@@ -57,6 +58,13 @@ namespace Divan
             get
             {
                 return port;
+            }
+        }
+        public string Protocol
+        {
+            get
+            {
+                return protocol;
             }
         }
         public string Host
@@ -95,7 +103,23 @@ namespace Divan
             Debug(string.Format("CouchServer({0}:{1})", host, port));
         }
 
-        public CouchServer(string host, int port): this(host, port, null, null)
+        public CouchServer(String protocol, string host, int port, string user, string pass)
+        {
+            this.protocol = protocol;
+            this.host = host;
+            this.port = port;
+            userName = user;
+            password = pass;
+
+            if (!String.IsNullOrEmpty(UserName))
+                encodedCredentials = "Basic " +
+                                     Convert.ToBase64String(Encoding.ASCII.GetBytes(UserName + ":" + Password));
+
+            Debug(string.Format("CouchServer({0}://{1}:{2})", protocol,host, port));
+        }
+
+        public CouchServer(string host, int port)
+            : this(host, port, null, null)
         {
         }
 
