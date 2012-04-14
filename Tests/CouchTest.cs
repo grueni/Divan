@@ -478,7 +478,6 @@ namespace Divan.Test
             Assert.That(longDistanceEcar.Distance == test2.Distance && longDistanceEcar.name.Equals(test2.name));
             longDistanceEcar.Distance = longDistanceEcar.Distance * 2;
             var rev0 = longDistanceEcar.Rev;
-
             longDistanceEcar = db.SaveArbitraryDocument<ECar>(longDistanceEcar);
             Assert.That(!rev0.Equals(longDistanceEcar.Rev), "Revisions must be different!");
             db.DeleteDocument(shortDistanceEcar.Id, shortDistanceEcar.Rev);
