@@ -36,7 +36,7 @@ namespace Divan.Lucene
         /// <returns>Modified query</returns>
         public LuceneQueryBase DefaultOr()
         {
-            Options["default_or"] = "true";
+            Options["default_or"] = "True";
             return this;
         }
 
@@ -64,7 +64,7 @@ namespace Divan.Lucene
             Options["sort"] = item.Field;
             
             if (item.Order == CouchSortCriteria.OrderType.Descending)
-                Options["descending"] = "true";
+                Options["descending"] = "True";
 
             return this;
         }

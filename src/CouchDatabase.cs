@@ -477,7 +477,7 @@ namespace Divan
 
 		public void SaveArbitraryDocuments<T>(IEnumerable<T> documents, bool allOrNothing)
 		{
-			SaveDocuments(documents.Select(doc => new CouchDocumentWrapper<T>(doc)).Cast<ICouchDocument>(), allOrNothing);
+			SaveDocuments(documents.Select(doc => new CouchDocumentWrapper<T>(doc)), allOrNothing);
 		}
 
 		/// <summary>
@@ -514,7 +514,7 @@ namespace Divan
 		public void SaveArbitraryDocuments<T>(IEnumerable<T> documents, int chunkCount, IEnumerable<ICouchViewDefinition> views, bool allOrNothing)
 		{
 			SaveDocuments(
-				documents.Select(doc => new CouchDocumentWrapper<T>(doc)).Cast<ICouchDocument>(),
+				documents.Select(doc => new CouchDocumentWrapper<T>(doc)),
 				chunkCount,
 				views,
 				allOrNothing);

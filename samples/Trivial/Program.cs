@@ -20,8 +20,11 @@ namespace Trivial
 	{
 		static void Main(string[] args)
 		{
-			string host = "localhost";
+
+			string host = "";
 			int port = 5984;
+			String username = "";
+			String password = "";
 
 			// Lets you see all HTTP requests made by Divan
 			Trace.Listeners.Add(new ConsoleTraceListener());
@@ -45,7 +48,7 @@ namespace Trivial
 
 			// Get a server instance. It only holds host, port and a string database prefix.
 			// For non trivial usage of Divan you typically create your own subclass of CouchServer.
-			var server = new CouchServer(host, port);
+			var server = new CouchServer(host, port,username,password);
 
 			/* This has issues with the windows build of couch db - something about file locking
 			// a little bit of cleanup

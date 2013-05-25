@@ -14,11 +14,15 @@ namespace Divan.Linq
     /// </summary>
     public class CouchQueryProvider: IQueryProvider
     {
-        ICouchDatabase db;
+        ICouchDatabase db =null;
         string view;
         string design;
 
         ICouchViewDefinition definition;
+
+        public CouchQueryProvider()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CouchQueryProvider"/> class.
@@ -86,10 +90,18 @@ namespace Divan.Linq
         /// <returns></returns>
         public virtual ExpressionVisitor Prepare(Expression expression)
         {
-            return 
-                definition == null ?
-                new ExpressionVisitor().ProcessExpression(expression, db, design, view) :
-                new ExpressionVisitor().ProcessExpression(expression, db, definition);
+            ExpressionVisitor rc = null;
+            try
+            {
+                rc = (definition == null) ?
+                    new ExpressionVisitor().ProcessExpression(expression, db, design, view) :
+                    new ExpressionVisitor().ProcessExpression(expression, db, definition);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return rc;
         }
 
         /// <summary>

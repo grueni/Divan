@@ -25,17 +25,25 @@ namespace Divan
             return Docs.Count();
         }
 
-        public virtual void WriteJson(JsonWriter writer)
+        public virtual void WriteJson(JsonWriter jsonWriter)
         {
-            writer.WritePropertyName("docs");
-            writer.WriteStartArray();
+            jsonWriter.WritePropertyName("docs");
+            jsonWriter.WriteStartArray();
             foreach (ICouchDocument doc in Docs)
             {
-                writer.WriteStartObject();
-                doc.WriteJson(writer);
-                writer.WriteEndObject();
-            }
-            writer.WriteEndArray();
+					 //jsonWriter.WriteStartObject();
+					 //doc.WriteJson(jsonWriter);
+					 //jsonWriter.WriteEndObject();
+					 if (!(doc is ISelfContained))
+					 {
+						 jsonWriter.WriteStartObject();
+						 doc.WriteJson(jsonWriter);
+						 jsonWriter.WriteEndObject();
+					 }
+					 else
+						 doc.WriteJson(jsonWriter);
+				}
+            jsonWriter.WriteEndArray();
         }
 
         public virtual void ReadJson(JObject obj)

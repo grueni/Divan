@@ -137,6 +137,28 @@ namespace Divan.Linq
                     .MakeGenericMethod(typeParams)
                     .Invoke(viewResult, null);
 
+            //Object dynamicResult = null;
+
+            //Console.WriteLine("davor 'typeof(T) is ICouchDocument'={0} {1} {2}", typeof(T) is ICouchDocument, typeof(T).ToString());
+            //if (typeof(T) is ICouchDocument)
+            //    dynamicResult =
+            //            viewResult
+            //            .GetType()
+            //            .GetMethods()
+            //            .First(m => m.Name == "ValueDocuments" && m.IsGenericMethodDefinition)
+            //            .MakeGenericMethod(typeParams)
+            //            .Invoke(viewResult, null);
+            //else
+            //    dynamicResult =
+            //            viewResult
+            //            .GetType()
+            //            .GetMethods()
+            //            .First(m => m.Name == "ArbitraryValueDocuments" && m.IsGenericMethodDefinition)
+            //            .MakeGenericMethod(typeParams)
+            //            .Invoke(viewResult, new Object[] {new T()});
+            //Console.WriteLine("danach");
+
+
             if (expVisitor.SelectExpression == null)
                 return ((IEnumerable<TReturn>)dynamicResult).GetEnumerator();
 

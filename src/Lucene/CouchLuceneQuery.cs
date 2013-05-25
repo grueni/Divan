@@ -55,7 +55,7 @@ namespace Divan.Lucene
         /// </summary>
         public LuceneQueryBase Debug()
         {
-            Options["debug"] = "true";
+            Options["debug"] = "True";
             return this;
         }
         
@@ -69,7 +69,7 @@ namespace Divan.Lucene
         /// </summary>
         public CouchLuceneQuery ForceJson()
         {
-            Options["force_json"] = "true";
+            Options["force_json"] = "True";
             return this;
         }
 
@@ -79,7 +79,7 @@ namespace Divan.Lucene
         /// </summary>
         public CouchLuceneQuery Rewrite()
         {
-            Options["rewrite"] = "true";
+            Options["rewrite"] = "True";
             return this;
         }
 

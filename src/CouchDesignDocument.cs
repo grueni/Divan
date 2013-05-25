@@ -191,7 +191,7 @@ namespace Divan
 			writer.WriteStartObject();
 			foreach (var definition in ViewDefinitions)
 			{
-				definition.WriteJson(writer);
+             definition.WriteJson(writer);
 			}
 			writer.WriteEndObject();
 
@@ -207,7 +207,7 @@ namespace Divan
 			writer.WriteStartObject();
 			foreach (var definition in ShowDefinitions)
 			{
-				definition.WriteJson(writer);
+             definition.WriteJson(writer);
 			}
 			writer.WriteEndObject();
 
@@ -247,7 +247,7 @@ namespace Divan
 			var lists = (JObject)obj["lists"];
 			if (lists != null)
 			{
-				foreach (var property in views.Properties())
+				foreach (var property in lists.Properties())
 				{
 					var l = new CouchListDefinition(property.Name, this);
 					l.ReadJson((JObject)lists[property.Name]);

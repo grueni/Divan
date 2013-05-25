@@ -51,7 +51,7 @@ namespace Divan.Lucene
         /// <returns></returns>
         public LuceneQueryBase IncludeDocuments()
         {
-            Options["include_docs"] = "true";
+            Options["include_docs"] = "True";
             return this;
         }
 

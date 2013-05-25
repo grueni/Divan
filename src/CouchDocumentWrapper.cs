@@ -127,16 +127,30 @@ namespace Divan
 
         public void WriteJson(JsonWriter writer)
         {
+            var tokenWriter = new JTokenWriter();
+            serializer.Serialize(tokenWriter, instance);
+            var obj = (JObject)tokenWriter.Token;
+            Console.WriteLine("1 obj={0}", obj.ToString());
             if (Id == null)
             {
-                var tokenWriter = new JTokenWriter();
-                serializer.Serialize(tokenWriter, instance);
-                var obj = (JObject)tokenWriter.Token;
+                Console.WriteLine("2a");
                 obj.Remove("_rev");
                 obj.Remove("_id");                
-                obj.WriteTo(writer);
-            } else
-                serializer.Serialize(writer, instance);
+            }
+            else if (String.IsNullOrEmpty(Rev))
+            {
+                Console.WriteLine("2b");
+//
+                obj.Remove("_rev");
+            }
+            else 
+            {
+                Console.WriteLine("2c");
+//                obj.Add("_rev", JToken.FromObject(Rev));
+            }
+				Console.WriteLine("3 obj={0}", obj.ToString());
+				Console.WriteLine("3 jsonWriter={0}", writer.ToString());
+				obj.WriteTo(writer);
         }
 
         public void ReadJson(JObject obj)

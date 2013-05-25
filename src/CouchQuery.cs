@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace Divan
 {
@@ -87,8 +88,9 @@ namespace Divan
         /// </summary>
         public CouchQuery StartKey(object value)
         {
-            Options["startkey"] = JToken.FromObject(value).ToString();
-            return this;
+			  Options["startkey"] = JToken.FromObject(value).ToString();
+			  Options["startkey"] = '"' + Options["startkey"] + '"';
+			  return this;
         }
 
         /// <summary>
@@ -98,7 +100,8 @@ namespace Divan
         public CouchQuery StartKey(params object[] value)
         {
             Options["startkey"] = value == null ? "null" : JToken.FromObject(value).ToString();
-            return this;
+				Options["startkey"] = '"' + Options["startkey"] + '"';
+				return this;
         }
 
         public CouchQuery StartKeyDocumentId(string value)
@@ -114,7 +117,8 @@ namespace Divan
         public CouchQuery EndKey(object value)
         {
             Options["endkey"] = JToken.FromObject(value).ToString();
-            return this;
+				Options["endkey"] = '"' + Options["endkey"] + '"';
+				return this;
         }
 
         /// <summary>
@@ -124,8 +128,25 @@ namespace Divan
         public CouchQuery EndKey(params object[] value)
         {
             Options["endkey"] = value == null ? "null" : JToken.FromObject(value).ToString();
-            return this;
+				Options["endkey"] = '"' + Options["endkey"] + '"';
+				return this;
         }
+
+        /// <summary>
+        /// Any valid JSON value is a valid key. This means:
+        ///  null, true, false, a string, a number, a Dictionary (JSON object) or an array (JSON array)
+        /// </summary>
+        //public CouchQuery EndKeyComposite(params object[] value)
+        //{
+        //    Console.WriteLine("0 value={0}", JToken.FromObject(value).ToString());
+        //    Options["endkey"] = value == null ? "null" : JToken.FromObject(value).ToString();
+        //    Console.WriteLine("endkey={0}", Options["endkey"]);
+        //    var pos = Options["endkey"].LastIndexOf("]");
+        //    Console.WriteLine("pos={0}", pos);
+        //    if (pos > 0)
+        //        Options["endkey"] = Options["endkey"].Substring(0, pos - 1) + ", {}" + Options["endkey"].Substring(pos);
+        //    return this;
+        //}
 
         public CouchQuery EndKeyDocumentId(string value)
         {
@@ -147,7 +168,7 @@ namespace Divan
 
         public CouchQuery Descending()
         {
-            Options["descending"] = "true";
+            Options["descending"] = "True";
             return this;
         }
 
@@ -159,7 +180,7 @@ namespace Divan
 
         public CouchQuery Group()
         {
-            Options["group"] = "true";
+            Options["group"] = "True";
             return this;
         }
 
@@ -171,13 +192,13 @@ namespace Divan
 
         public CouchQuery Reduce()
         {
-            Options["reduce"] = "true";
+            Options["reduce"] = "True";
             return this;
         }
 
         public CouchQuery IncludeDocuments()
         {
-            Options["include_docs"] = "true";
+            Options["include_docs"] = "True";
             return this;
         }
 
