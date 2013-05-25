@@ -68,7 +68,7 @@ namespace Divan
         /// </summary>
         public CouchQuery Key(object value)
         {
-            Options["key"] = value == null ? "null" : JToken.FromObject(value).ToString();
+			  Options["key"] = value == null ? "null" : CheckQuoting( JToken.FromObject(value).ToString());
             return this;
         }
 
@@ -78,7 +78,7 @@ namespace Divan
         /// </summary>
         public CouchQuery Key(params object[] value)
         {
-            Options["key"] = value == null ? "null" : JToken.FromObject(value).ToString();
+			  Options["key"] = value == null ? "null" : CheckQuoting( JToken.FromObject(value).ToString());
             return this;
         }
 
@@ -88,8 +88,7 @@ namespace Divan
         /// </summary>
         public CouchQuery StartKey(object value)
         {
-			  Options["startkey"] = JToken.FromObject(value).ToString();
-			  Options["startkey"] = '"' + Options["startkey"] + '"';
+			  Options["startkey"] = CheckQuoting( JToken.FromObject(value).ToString());
 			  return this;
         }
 
@@ -99,8 +98,7 @@ namespace Divan
         /// </summary>
         public CouchQuery StartKey(params object[] value)
         {
-            Options["startkey"] = value == null ? "null" : JToken.FromObject(value).ToString();
-				Options["startkey"] = '"' + Options["startkey"] + '"';
+            Options["startkey"] = value == null ? "null" : CheckQuoting( JToken.FromObject(value).ToString());
 				return this;
         }
 
@@ -116,8 +114,7 @@ namespace Divan
         /// </summary>
         public CouchQuery EndKey(object value)
         {
-            Options["endkey"] = JToken.FromObject(value).ToString();
-				Options["endkey"] = '"' + Options["endkey"] + '"';
+            Options["endkey"] = CheckQuoting( JToken.FromObject(value).ToString());
 				return this;
         }
 
@@ -127,8 +124,7 @@ namespace Divan
         /// </summary>
         public CouchQuery EndKey(params object[] value)
         {
-            Options["endkey"] = value == null ? "null" : JToken.FromObject(value).ToString();
-				Options["endkey"] = '"' + Options["endkey"] + '"';
+            Options["endkey"] = value == null ? "null" : CheckQuoting( JToken.FromObject(value).ToString());
 				return this;
         }
 
@@ -307,5 +303,14 @@ namespace Divan
                 throw CouchException.Create("Query failed", e);
             }
         }
+
+		  String CheckQuoting(String value)
+		  {
+			  String rc = value;
+			  if (!rc.StartsWith("["))
+				  rc = '"' + rc + '"';
+			  return rc;
+		  }
+
     }
 }
