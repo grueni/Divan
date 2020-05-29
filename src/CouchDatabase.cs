@@ -602,6 +602,25 @@ namespace Divan
 			return QueryAllDocuments().Data(CouchDocument.WriteJson(bulk)).IncludeDocuments().GetResult().Documents<T>();
 		}
 
+		public T GetDesignDocument<T>(string documentId) where T : ICouchDesignDocument, new()
+		{
+			T obj = new T()
+			{
+				Id = documentId,
+				Owner = (ICouchDatabase)this
+			};
+			try
+			{
+				this.ReadDocument((ICouchDocument)obj);
+			}
+			catch (CouchNotFoundException ex)
+			{
+				return default(T);
+			}
+			return obj;
+		}
+
+
 		public T GetDocument<T>(string documentId) where T : ICouchDocument, new()
 		{
 			var doc = new T { Id = documentId };
@@ -636,6 +655,7 @@ namespace Divan
 			var bulk = new CouchBulkKeys(documentIds.Cast<object>());
 			return QueryAllDocuments().Data(CouchDocument.WriteJson(bulk)).IncludeDocuments().GetResult().ArbitraryDocuments(ctor);
 		}
+
 
 		public CouchJsonDocument GetDocument(string documentId)
 		{

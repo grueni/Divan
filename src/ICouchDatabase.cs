@@ -45,7 +45,8 @@ namespace Divan
         bool HasDocumentChanged(ICouchDocument document);
         void Initialize();
         CouchDesignDocument NewDesignDocument(string aName);
-        ICouchViewDefinition NewTempView(string designDoc, string viewName, string mapText);
+		T GetDesignDocument<T>(string documentId) where T : ICouchDesignDocument, new();
+		ICouchViewDefinition NewTempView(string designDoc, string viewName, string mapText);
         CouchQuery Query(ICouchViewDefinition view);
         CouchQuery Query(string designName, string viewName);
         CloudantLuceneQuery Query(CloudantLuceneViewDefinition view);

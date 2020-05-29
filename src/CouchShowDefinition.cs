@@ -26,6 +26,11 @@ namespace Divan
 			writer.WriteValue(Show);
 		}
 
+		public void ReadJson(string obj)
+		{
+			this.Show = obj;
+		}
+
 		new public void ReadJson(JObject obj)
 		{
 			Show = (string)obj;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Divan.Lucene;
@@ -10,11 +11,11 @@ namespace Divan
 	/// <summary>
 	/// A named design document in CouchDB. Holds CouchViewDefinitions and CouchLuceneViewDefinitions (if you use Couchdb-Lucene).
 	/// </summary>
-	public class CouchDesignDocument : CouchDocument, IEquatable<CouchDesignDocument>
+	public class CouchDesignDocument : CouchDocument, IEquatable<CouchDesignDocument>,ICouchDesignDocument
 	{
 
 		public Dictionary<string, ICouchViewDefinition> Views = new Dictionary<string, ICouchViewDefinition>();
-		public Dictionary<string, CouchListDefinition> Lists = new Dictionary<string, CouchListDefinition>();
+		public Dictionary<string, ICouchListDefinition> Lists = new Dictionary<string, ICouchListDefinition>();
 		public Dictionary<string, CouchShowDefinition> Shows = new Dictionary<string, CouchShowDefinition>();
 
 		public IList<CouchViewDefinition> ViewDefinitions = new List<CouchViewDefinition>();
@@ -25,7 +26,8 @@ namespace Divan
 		public IList<CouchLuceneViewDefinition> LuceneDefinitions = new List<CouchLuceneViewDefinition>();
 
 		public string Language = "javascript";
-		public ICouchDatabase Owner;
+		public ICouchDatabase Owner { get; set; }
+
 
 		public CouchDesignDocument(string documentId, ICouchDatabase owner)
 			: base("_design/" + documentId)
@@ -226,6 +228,80 @@ namespace Divan
 			}
 		}
 
+/*
+		public override void ReadJson(JObject obj)
+		{
+			CouchDocument.ReadIdAndRev((ICouchDocument)this, obj);
+			if (obj["language"] != null)
+				this.Language = (string)Extensions.Value<string>((IEnumerable<JToken>)obj["language"]);
+			this.ViewDefinitions = (IList<CouchViewDefinition>)new List<CouchViewDefinition>();
+			JObject jobject1 = (JObject)obj["views"];
+			using (IEnumerator<JProperty> enumerator = jobject1.Properties().GetEnumerator())
+			{
+				while (((IEnumerator)enumerator).MoveNext())
+				{
+					JProperty current = enumerator.Current;
+					CouchViewDefinition couchViewDefinition = new CouchViewDefinition(current.Name, this);
+					couchViewDefinition.ReadJson((JObject)jobject1[current.Name]);
+					if (this.Views.ContainsKey(current.Name))
+						this.Views.Remove(current.Name);
+					this.Views.Add(current.Name, (ICouchViewDefinition)couchViewDefinition);
+					this.ViewDefinitions.Add(couchViewDefinition);
+				}
+			}
+			this.ListDefinitions = (IList<CouchListDefinition>)new List<CouchListDefinition>();
+			JObject jobject2 = (JObject)obj["lists"];
+			if (jobject2 != null)
+			{
+				using (IEnumerator<JProperty> enumerator = jobject2.Properties().GetEnumerator())
+				{
+					while (((IEnumerator)enumerator).MoveNext())
+					{
+						JProperty current = enumerator.Current;
+						CouchListDefinition couchListDefinition = new CouchListDefinition(current.Name, this);
+						var test = jobject2[current.Name];
+						couchListDefinition.ReadJson(((object)jobject2[current.Name]).ToString());
+						if (this.Lists.ContainsKey(current.Name))
+							this.Lists.Remove(current.Name);
+						this.Lists.Add(current.Name, (ICouchListDefinition)couchListDefinition);
+						this.ListDefinitions.Add(couchListDefinition);
+					}
+				}
+			}
+			this.ShowDefinitions = (IList<CouchShowDefinition>)new List<CouchShowDefinition>();
+			JObject jobject3 = (JObject)obj["shows"];
+			if (jobject3 != null)
+			{
+				using (IEnumerator<JProperty> enumerator = jobject3.Properties().GetEnumerator())
+				{
+					while (((IEnumerator)enumerator).MoveNext())
+					{
+						JProperty current = enumerator.Current;
+						CouchShowDefinition couchShowDefinition = new CouchShowDefinition(current.Name, this);
+						couchShowDefinition.ReadJson(((object)jobject3[current.Name]).ToString());
+						if (this.Shows.ContainsKey(current.Name))
+							this.Shows.Remove(current.Name);
+						this.Shows.Add(current.Name, couchShowDefinition);
+						this.ShowDefinitions.Add(couchShowDefinition);
+					}
+				}
+			}
+			JObject jobject4 = (JObject)obj["fulltext"];
+			if (jobject4 == null)
+				return;
+			using (IEnumerator<JProperty> enumerator = jobject4.Properties().GetEnumerator())
+			{
+				while (((IEnumerator)enumerator).MoveNext())
+				{
+					JProperty current = enumerator.Current;
+					CouchLuceneViewDefinition luceneViewDefinition = new CouchLuceneViewDefinition(current.Name, this);
+					luceneViewDefinition.ReadJson((JObject)jobject4[current.Name]);
+					this.LuceneDefinitions.Add(luceneViewDefinition);
+				}
+			}
+		}
+*/
+
 		public override void ReadJson(JObject obj)
 		{
 			ReadIdAndRev(this, obj);
@@ -237,7 +313,9 @@ namespace Divan
 			foreach (var property in views.Properties())
 			{
 				var v = new CouchViewDefinition(property.Name, this);
-				v.ReadJson((JObject)views[property.Name]);
+				//				v.ReadJson((JObject)views[property.Name]);
+				var view = views[property.Name] as JObject;
+				v.ReadJson(view);
 				if (Views.ContainsKey(property.Name)) Views.Remove(property.Name);
 				Views.Add(property.Name, v);
 				ViewDefinitions.Add(v);
@@ -249,31 +327,32 @@ namespace Divan
 			{
 				foreach (var property in lists.Properties())
 				{
+					//					l.ReadJson((JObject)lists[property.Name]);
+					//					l.ReadJson(((object)lists[property.Name]).ToString());
+					var list = lists[property.Name] as JObject;
 					var l = new CouchListDefinition(property.Name, this);
-					l.ReadJson((JObject)lists[property.Name]);
+					if (list == null) continue;
+					l.ReadJson(list);
 					if (Lists.ContainsKey(property.Name)) Lists.Remove(property.Name);
 					Lists.Add(property.Name, l);
 					ListDefinitions.Add(l);
 				}
 			}
 
-
 			var shows = (JObject)obj["shows"];
 			if (shows != null)
 			{
 				foreach (var property in shows.Properties())
 				{
-					var s = new CouchShowDefinition(property.Name, this);
 					var show = shows[property.Name] as JObject;
 					if (show == null) continue;
+					var s = new CouchShowDefinition(property.Name, this);
 					s.ReadJson(show);
 					if (Shows.ContainsKey(property.Name)) Shows.Remove(property.Name);
 					Shows.Add(property.Name, s);
 					ShowDefinitions.Add(s);
 				}
 			}
-
-
 
 			var fulltext = (JObject)obj["fulltext"];
 			// If we have Lucene definitions we read them too

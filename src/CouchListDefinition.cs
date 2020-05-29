@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Divan
 {
-	public class CouchListDefinition : CouchViewDefinition
+	public class CouchListDefinition : CouchViewDefinition,ICouchListDefinition
 	{
 		public string List {get; set;}
 		public string ViewName { get; set;}
@@ -24,6 +24,11 @@ namespace Divan
 		{
 			writer.WritePropertyName(Name);
 			writer.WriteValue(List);
+		}
+
+		public void ReadJson(string obj)
+		{
+			this.List = obj;
 		}
 
 		new public void ReadJson(JObject obj)
